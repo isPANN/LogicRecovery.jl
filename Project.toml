@@ -1,0 +1,13 @@
+name = "IsingLogicMachine"
+uuid = "ef340338-a1b4-473d-bf25-186ab1ab62f2"
+authors = ["Xiwei Pan"]
+version = "1.0.0-DEV"
+
+[compat]
+julia = "1.11"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]

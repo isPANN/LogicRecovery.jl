@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+IsingLogicMachine = "ef340338-a1b4-473d-bf25-186ab1ab62f2"
