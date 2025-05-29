@@ -1,100 +1,130 @@
-module ClassicalCircuits
+"""
+    LogicCircuit
 
-using ..LogicRecovery
-
-
-struct FullAdder
-    a::Bool
-    b::Bool
-    cin::Bool
-    sum::Bool
-    cout::Bool
+A simple structure representing a logic circuit with inputs and outputs.
+"""
+struct LogicCircuit
+    n_inputs::Int
+    n_outputs::Int
+    input_labels::Vector{String}  # Labels for input bits
+    output_labels::Vector{String} # Labels for output bits
+    circuit_function::Function    # Function that takes input array and returns output array
 end
 
+"""
+    create_logic_circuit(n_inputs::Int, n_outputs::Int, circuit_function::Function;
+                        input_labels::Vector{String}=String[],
+                        output_labels::Vector{String}=String[])::LogicCircuit
 
-function create_full_adder(a::Bool, b::Bool, cin::Bool)
+Create a logic circuit with specified number of inputs and outputs.
+- n_inputs: number of input bits
+- n_outputs: number of output bits
+- circuit_function: function that takes input array and returns output array
+- input_labels: labels for input bits (optional)
+- output_labels: labels for output bits (optional)
+"""
+function create_logic_circuit(n_inputs::Int, n_outputs::Int, circuit_function::Function;
+                              input_labels::Vector{String}=String[], 
+                              output_labels::Vector{String}=String[])
+    input_labels = isempty(input_labels) ? ["in$i" for i in 1:n_inputs] : input_labels
+    output_labels = isempty(output_labels) ? ["out$i" for i in 1:n_outputs] : output_labels
+    if length(input_labels) != n_inputs
+        error("Expected $n_inputs input labels, got $(length(input_labels))")
+    end
+    if length(output_labels) != n_outputs
+        error("Expected $n_outputs output labels, got $(length(output_labels))")
+    end
+    return LogicCircuit(n_inputs, n_outputs, input_labels, output_labels, circuit_function)
+end
+
+"""
+    evaluate_circuit(circuit::LogicCircuit, inputs::Vector{Bool})::Vector{Bool}
+
+Evaluate the circuit with given inputs and return the outputs.
+"""
+function evaluate_circuit(circuit::LogicCircuit, inputs::Vector{Bool})
+    if length(inputs) != circuit.n_inputs
+        error("Expected $(circuit.n_inputs) inputs, got $(length(inputs))")
+    end
+    return circuit.circuit_function(inputs)
+end
+
+"""
+    get_all_circuit_states(circuit::LogicCircuit)::Vector{Vector{Bool}}
+
+Return all possible input-output states of the circuit as a vector of vectors.
+Each inner vector contains [inputs..., outputs...].
+"""
+function get_all_circuit_states(circuit::LogicCircuit; verbose::Bool=false)::Vector{BitVector}
+    states = BitVector[]
+    n_inputs = circuit.n_inputs
+
+    for i in 0:(2^n_inputs - 1)
+        inputs = digits(Bool, i, base=2, pad=n_inputs)
+        outputs = evaluate_circuit(circuit, inputs)
+        bits = BitVector(vcat(inputs, outputs))
+        push!(states, bits)
+        if verbose
+            println("Input: ", inputs, " => Output: ", outputs)
+        end
+    end
+
+    return states
+end
+
+"""
+    print_circuit_truth_table(circuit::LogicCircuit)
+
+Print the truth table of the circuit with labeled inputs and outputs.
+"""
+function print_circuit_truth_table(circuit::LogicCircuit)
+    states = get_all_circuit_states(circuit)
+    input_labels = circuit.input_labels
+    output_labels = circuit.output_labels
+
+    # Print header
+    println("Idx", "\t|\t", join(input_labels, "\t"), "\t|\t", join(output_labels, "\t"))
+    println("-"^70)
+
+    for (idx, state) in enumerate(states)
+        inputs = state[1:circuit.n_inputs]
+        outputs = state[circuit.n_inputs+1:end]
+        println(idx, "\t|\t", join(Bool.(inputs), "\t"), "\t|\t", join(Bool.(outputs), "\t"))
+    end
+end
+
+# Example1: Full Adder implementation
+function full_adder(inputs::Vector{Bool})
+    a, b, cin = inputs
     sum = xor(xor(a, b), cin)
     cout = (a & b) | (cin & (a | b))
-    return FullAdder(a, b, cin, sum, cout)
+    return [sum, cout]
 end
 
+"""
+    create_full_adder()::LogicCircuit
 
-function get_all_full_adder_states()
-    states = FullAdder[]
-    for a in [false, true]
-        for b in [false, true]
-            for cin in [false, true]
-                push!(states, create_full_adder(a, b, cin))
-            end
-        end
-    end
-    return states
-end
-
-
-function convert_to_logic_input(circuit::FullAdder)
-    inputs = Dict(
-        "a" => circuit.a,
-        "b" => circuit.b,
-        "cin" => circuit.cin
+Create a full adder circuit instance.
+"""
+function create_full_adder()::LogicCircuit
+    return create_logic_circuit(
+        3, 2, 
+        full_adder,
+        input_labels=["a", "b", "cin"],
+        output_labels=["sum", "cout"]
     )
-    outputs = Dict(
-        "sum" => circuit.sum,
-        "cout" => circuit.cout
+end
+
+#Example2: And + Xor
+function and_xor(inputs::Vector{Bool})
+    a, b, c = inputs
+    and_result = a & b
+    return [xor(and_result, c)]
+end
+
+function create_toy_model()::LogicCircuit
+    return create_logic_circuit(
+        3, 1,
+        and_xor
     )
-    return LogicInput(inputs, outputs)
 end
-
-
-struct LogicCircuit
-    inputs::Dict{String, Bool}
-    outputs::Dict{String, Bool}
-    circuit_function::Function  # 用于计算输出的函数
-end
-
-
-function create_logic_circuit(input_names::Vector{String}, output_names::Vector{String}, circuit_function::Function)
-    # 初始化所有输入为false
-    inputs = Dict(name => false for name in input_names)
-    # 计算初始输出
-    outputs = circuit_function(inputs)
-    return LogicCircuit(inputs, outputs, circuit_function)
-end
-
-
-function update_circuit(circuit::LogicCircuit, new_inputs::Dict{String, Bool})
-    # 验证输入
-    for (name, _) in new_inputs
-        if !haskey(circuit.inputs, name)
-            error("Unknown input: $name")
-        end
-    end
-    # 更新输入并计算新输出
-    new_outputs = circuit.circuit_function(new_inputs)
-    return LogicCircuit(new_inputs, new_outputs, circuit.circuit_function)
-end
-
-
-function get_all_circuit_states(circuit::LogicCircuit)
-    states = LogicCircuit[]
-    input_names = collect(keys(circuit.inputs))
-    n_inputs = length(input_names)
-    
-    # 生成所有可能的输入组合
-    for i in 0:(2^n_inputs - 1)
-        # 将数字转换为二进制输入
-        binary = digits(Bool, i, base=2, pad=n_inputs)
-        new_inputs = Dict(input_names[j] => binary[j] for j in 1:n_inputs)
-        push!(states, update_circuit(circuit, new_inputs))
-    end
-    return states
-end
-
-function convert_to_logic_input(circuit::LogicCircuit)
-    return LogicInput(circuit.inputs, circuit.outputs)
-end
-
-export LogicCircuit, create_logic_circuit, update_circuit, get_all_circuit_states, convert_to_logic_input,
-       FullAdder, create_full_adder, get_all_full_adder_states
-
-end # module 
