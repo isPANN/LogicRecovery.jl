@@ -1,14 +1,14 @@
 ```@meta
-CurrentModule = IsingLogicMachine
+CurrentModule = LogicRecovery
 ```
 
-# IsingLogicMachine
+# LogicRecovery
 
-Documentation for [IsingLogicMachine](https://github.com/isPANN/IsingLogicMachine.jl).
+Documentation for [LogicRecovery](https://github.com/isPANN/LogicRecovery.jl).
 
 ```@index
 ```
 
 ```@autodocs
-Modules = [IsingLogicMachine]
+Modules = [LogicRecovery]
 ```

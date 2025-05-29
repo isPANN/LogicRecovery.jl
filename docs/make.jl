@@ -1,14 +1,14 @@
-using IsingLogicMachine
+using LogicRecovery
 using Documenter
 
-DocMeta.setdocmeta!(IsingLogicMachine, :DocTestSetup, :(using IsingLogicMachine); recursive=true)
+DocMeta.setdocmeta!(LogicRecovery, :DocTestSetup, :(using LogicRecovery); recursive=true)
 
 makedocs(;
-    modules=[IsingLogicMachine],
+    modules=[LogicRecovery],
     authors="Xiwei Pan",
-    sitename="IsingLogicMachine.jl",
+    sitename="LogicRecovery.jl",
     format=Documenter.HTML(;
-        canonical="https://isPANN.github.io/IsingLogicMachine.jl",
+        canonical="https://isPANN.github.io/LogicRecovery.jl",
         edit_link="main",
         assets=String[],
     ),
@@ -18,6 +18,6 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/isPANN/IsingLogicMachine.jl",
+    repo="github.com/isPANN/LogicRecovery.jl",
     devbranch="main",
 )
