@@ -1,9 +1,21 @@
-name = "IsingLogicMachine"
+name = "LogicRecovery"
 uuid = "ef340338-a1b4-473d-bf25-186ab1ab62f2"
 authors = ["Xiwei Pan"]
 version = "1.0.0-DEV"
 
+[deps]
+Flux = "587475ba-b771-5e3f-ad9e-33799f191a9c"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+OMEinsum = "ebe7aa44-baf0-506c-a96f-8464559b3922"
+Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
+
 [compat]
+Flux = "0.16.3"
+LinearAlgebra = "1.11.0"
+OMEinsum = "0.8.7"
+Random = "1.11.0"
+Zygote = "0.7.7"
 julia = "1.11"
 
 [extras]

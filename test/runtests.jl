@@ -1,6 +1,6 @@
-using IsingLogicMachine
+using LogicRecovery
 using Test
 
-@testset "IsingLogicMachine.jl" begin
+@testset "LogicRecovery.jl" begin
     include("input_test.jl")
 end
