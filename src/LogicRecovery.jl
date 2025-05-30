@@ -1,13 +1,10 @@
 module LogicRecovery
 
-# include("logicinput.jl")
-# include("energy.jl")
-# include("optimization.jl")
-# include("algorithms.jl")
-# include("bayes.jl")
+
 include("classical_circuits.jl")
+include("algorithms/tensor_example.jl")
 
-
+# classical circuits
 export LogicCircuit
 export create_logic_circuit
 export evaluate_circuit
