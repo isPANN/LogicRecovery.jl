@@ -2,7 +2,6 @@ module LogicRecovery
 
 
 include("classical_circuits.jl")
-include("algorithms/tensor_example.jl")
 
 # classical circuits
 export LogicCircuit
